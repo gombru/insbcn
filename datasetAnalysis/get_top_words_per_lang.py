@@ -83,7 +83,16 @@ print "Word with max repetitions has:  " + str(max(words[2].values()))
 #Plot
 languages = ['en','es','ca']
 for l in range(3):
+    print languages[l]
     words_sorted = sorted(words[l].items(), key=operator.itemgetter(1))
+
+    # Print top words
+    num2print = 50
+    out = ""
+    for i in range(num2print):
+        out = out + ' ' + words_sorted[-i - 1][0]
+    print out
+
     words_count_sorted = words[l].values()
     words_count_sorted.sort(reverse=True)
     topX = 20
@@ -91,9 +100,10 @@ for l in range(3):
     my_xticks = []
     for l in range(1,topX):
         my_xticks.append(words_sorted[-l-1][0])
-    plt.xticks(x, my_xticks, rotation=90, size=8)
+    plt.xticks(x, my_xticks, rotation=90, size=11)
     width = 1/1.5
     plt.bar(x, words_count_sorted[1:topX], width, color="blue", align="center")
+    plt.tight_layout()
     plt.title("Num of top words " + languages[l])
     plt.show()
 
