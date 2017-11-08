@@ -5,7 +5,7 @@ import operator
 from langdetect import detect, detect_langs
 
 print "Loading data"
-with open("../../datasets/instaBarcelona/captions.json","r") as file:
+with open("../../../hd/datasets/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 print "Counting languages"

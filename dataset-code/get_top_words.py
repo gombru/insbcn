@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import plotly.plotly as py
 from load_jsons import *
 import operator
+from stop_words import get_stop_words
+
 
 print "Loading data"
 with open("../../datasets/instaBarcelona/captions.json","r") as file:
@@ -9,6 +11,15 @@ with open("../../datasets/instaBarcelona/captions.json","r") as file:
 
 symbols = ['.','/','\\',',']
 stop = ['que','the','and','para','con','los','por','una','del','las','for','you','with','this','mas','are','como','that']
+en_stop = get_stop_words('en')
+for w in en_stop:
+    stop.append(w)
+es_stop = get_stop_words('es')
+for w in es_stop:
+    stop.append(w)
+ca_stop = get_stop_words('ca')
+for w in ca_stop:
+    stop.append(w)
 
 print "Counting words"
 words = {}
