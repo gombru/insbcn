@@ -14,7 +14,11 @@ languages = {}
 for k,v in data.iteritems():
     caption = v.replace('#', ' ')
     caption = caption.lower()
-    lan = detect(caption)
+    try:
+        lan = detect(caption)
+    except:
+        print "Lang detection failed. Continuing"
+        continue
 
     if lan not in languages:
         languages[lan] = 1

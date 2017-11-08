@@ -7,7 +7,7 @@ from langdetect import detect, detect_langs
 
 
 print "Loading data"
-with open("../../../datasets/instaBarcelona/captions.json","r") as file:
+with open("../../../hd/datasets/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 symbols = ['.','/','\\',',']
@@ -28,7 +28,12 @@ words = [dict() for x in range(3)]
 for k,v in data.iteritems():
     caption = v.replace('#', ' ')
     caption = caption.lower()
-    lan = detect(caption)
+    try:
+        lan = detect(caption)
+    except:
+        print "Lang detection failed. Continuing"
+        continue
+
     c_words = caption.split()
 
     # Filter stop_words
