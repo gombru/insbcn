@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import plotly.plotly as py
-from load_jsons import *
+import json
 import operator
 from stop_words import get_stop_words
 
 
 print "Loading data"
-with open("../../datasets/instaBarcelona/captions.json","r") as file:
+with open("../../../hd/datasets/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 symbols = ['.','/','\\',',']

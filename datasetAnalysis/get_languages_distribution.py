@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import plotly.plotly as py
-from load_jsons import *
+import json
 import operator
 from langdetect import detect, detect_langs
 
@@ -30,7 +30,7 @@ print "Languages with max repetitions has:  " + str(max(languages.values()))
 lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(10,len(lan_count_sorted))
+topX = min(3,len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
 for l in range(0,topX):
