@@ -37,7 +37,7 @@ for l in range(0,topX):
     my_xticks.append(lan_sorted[-l-1][0])
 plt.xticks(x, my_xticks)
 width = 1/1.5
-plt.bar(x, lan_count_sorted[0:topX], width, color="blue")
+plt.bar(x, lan_count_sorted[0:topX], width, color="blue", align="center")
 plt.title("Num of top languages")
 plt.show()
 
