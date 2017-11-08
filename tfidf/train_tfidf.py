@@ -11,10 +11,12 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 
 cores = multiprocessing.cpu_count()
 
+base_path = '../../../hd/datasets/instaBarcelona/'
+
 whitelist = string.letters + string.digits + ' '
-instaBCN_text_data_path = '../../../datasets/instaBarcelona/captions.json'
+instaBCN_text_data_path = base_path + 'captions.json'
 model_name = 'tfidf_model_instaBarcelona.model'
-model_path = '../../../datasets/instaBarcelona/models/tfidf/'
+model_path = base_path + 'models/tfidf/'
 words2filter = ['rt','http','t','gt','co','s','https','http','tweet','markars_','photo','pictur','picture','say','photo','much','tweet','now','blog','wikipedia','google', 'flickr', 'figure', 'photo', 'image', 'homepage', 'url', 'youtube','wikipedia','google', 'flickr', 'figure', 'photo', 'image', 'homepage', 'url', 'youtube', 'images', 'blog', 'pinterest']
 
 print "Loading data"

@@ -16,18 +16,19 @@ import multiprocessing
 import json
 
 # Load data and model
-instaBCN_text_data_path = '../../../datasets/instaBarcelona/captions.json'
-model_path = '../../../datasets/instaBarcelona/models/word2vec/word2vec_model_instaBarcelona.model'
+base_path = '../../../hd/datasets/instaBarcelona/'
+instaBCN_text_data_path = base_path + 'captions.json'
+model_path = base_path + 'models/word2vec/word2vec_model_instaBarcelona.model'
 tfidf_weighted = True
-tfidf_model_path = '../../../datasets/instaBarcelona/models/tfidf/tfidf_model_instaBarcelona.model'
-tfidf_dictionary_path = '../../../datasets/instaBarcelona/models/tfidf/docs.dict'
+tfidf_model_path = base_path + 'models/tfidf/tfidf_model_instaBarcelona.model'
+tfidf_dictionary_path = base_path + 'models/tfidf/docs.dict'
 
 # Create output files
 dir = "word2vec_mean_gt"
 if tfidf_weighted: dir = "word2vec_tfidf_weighted_gt"
-gt_path_train = '../../../datasets/instaBarcelona/' + dir + '/train_instaBarcelona_divbymax.txt'
-gt_path_val = '../../../datasets/instaBarcelona/' + dir + '/val_instaBarcelona_divbymax.txt'
-gt_path_test = '../../../datasets/instaBarcelona/' + dir + '/test_instaBarcelona_divbymax.txt'
+gt_path_train = base_path + dir + '/train_instaBarcelona_divbymax.txt'
+gt_path_val = base_path + dir + '/val_instaBarcelona_divbymax.txt'
+gt_path_test = base_path + dir + '/test_instaBarcelona_divbymax.txt'
 train_file = open(gt_path_train, "w")
 val_file = open(gt_path_val, "w")
 test_file = open(gt_path_test, "w")
