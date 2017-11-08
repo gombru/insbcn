@@ -38,8 +38,8 @@ topX = min(3,len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
 for l in range(0,topX):
-    my_xticks.append(lan_sorted[-l-1][0], size = 11)
-plt.xticks(x, my_xticks)
+    my_xticks.append(lan_sorted[-l-1][0])
+plt.xticks(x, my_xticks, size = 11)
 width = 1/1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="blue", align="center")
 plt.title("Num of top languages")
