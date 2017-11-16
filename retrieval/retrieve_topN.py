@@ -115,7 +115,7 @@ def get_results_complex(database, text, word_weights, num_results, results_path)
 q = []
 w = [] # Weights per word (can be negative)
 
-word_list = ['sagradafamilia','gaudi','beer','cerveza','estrella','independencia','politica','politics','rambla','food','paella','sangria','healthy','burger','cocktail','restaurant','moritz','heineken','sanmiguel','vegan','healthyfood','sants','barri','gracia','sanantoni','santandreu','gotic','gothic','eixample','lescorts','poblenou','eurecat','pedralbes','sarria','poblesec','badalona','sitges','barcelona', 'food', 'shopping', 'fun', 'holidays', 'tourism', 'morning', 'breakfast', 'lunch', 'dinner', 'night', 'american', 'catalan', 'spanish', 'espanyol' , 'español','america', 'americano', 'catalunya', 'cataluña', 'españa', 'espanya', 'immigrant', 'immigration', 'immigrant', 'inmigrante', 'work', 'treball', 'trabajo', 'music', 'musica']
+word_list = ['sagradafamilia','gaudi','beer','cerveza','estrella','independencia','politica','politics','rambla','food','paella','sangria','healthy','burger','cocktail','restaurant','moritz','heineken','sanmiguel','vegan','healthyfood','sants','barri','gracia','sanantoni','santandreu','gotic','gothic','eixample','lescorts','poblenou','eurecat','pedralbes','sarria','poblesec','badalona','sitges','barcelona', 'food', 'shopping', 'fun', 'holidays', 'tourism', 'morning', 'breakfast', 'lunch', 'dinner', 'night', 'american', 'catalan', 'spanish', 'espanyol' , 'espaol','america', 'americano', 'catalunya', 'catalua', 'espaa', 'espanya', 'immigrant', 'immigration', 'immigrant', 'inmigrante', 'work', 'treball', 'trabajo', 'music', 'musica']
 for words in word_list:
     q.append(words)
     w.append('1')
