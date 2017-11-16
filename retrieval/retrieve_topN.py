@@ -84,7 +84,7 @@ def get_results(database, topics, num_results, results_path):
     # Get elements with min distances
     for idx,id in enumerate(distances):
         # Copy image results
-        copyfile('../../../hd/datasets/instaBarcelona/img_resized/' + id[0] , results_path + id[0].replace('/', '_'))
+        copyfile('../../../hd/datasets/instaBarcelona/img_resized/' + id[0] + '.jpg' , results_path + id[0].replace('/', '_') + '.jpg')
         if idx == num_results - 1: break
 
 def get_results_complex(database, text, word_weights, num_results, results_path):
@@ -107,7 +107,7 @@ def get_results_complex(database, text, word_weights, num_results, results_path)
     # Get elements with min distances
     for idx,id in enumerate(distances):
         # Copy image results
-        copyfile('../../../hd/datasets/instaBarcelona/img_resized/' + id[0] , results_path + id[0].replace('/', '_'))
+        copyfile('../../../hd/datasets/instaBarcelona/img_resized/' + id[0] + '.jpg', results_path + id[0].replace('/', '_') + '.jpg')
         if idx == num_results - 1: break
 
 
