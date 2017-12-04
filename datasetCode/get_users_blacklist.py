@@ -5,8 +5,10 @@ import collections
 
 createBlacklist = True
 
-data = load("../../hd/datasets/instaBarcelona/json/")
+data = load("../../../hd/datasets/instaBarcelona/json/")
 print "Number of jsons: " + str(len(data))
+
+posts_TH = 50  # Will discard users having more than 100 publications, they are probably spam
 
 # Plot num of publications of top  users
 users = {}
@@ -32,8 +34,7 @@ print "Done"
 if createBlacklist:
     # Create a blacklist of users: That will be users having more than X publications (100)
     print "Creating users black list"
-    users_blacklist = open("../../hd/datasets/instaBarcelona/users_blacklist.txt","w")
-    posts_TH = 50 #Will discard users having more than 100 publications, they are probably spam
+    users_blacklist = open("../../../hd/datasets/instaBarcelona/users_blacklist" + str(posts_TH) + ".txt","w")
     blacklisted = 0
     for user, num in users.iteritems():
         if num > posts_TH:
