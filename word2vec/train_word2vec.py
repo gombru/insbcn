@@ -41,7 +41,6 @@ for w in es_stop:
     en_stop.append(w)
 for w in ca_stop:
     en_stop.append(w)
-
 # add own stop words
 for w in words2filter:
     en_stop.append(w)
