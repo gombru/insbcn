@@ -6,7 +6,7 @@ from nltk.tokenize import RegexpTokenizer
 from stop_words import get_stop_words
 from nltk.stem.porter import PorterStemmer
 from gensim import corpora, models
-import glob
+import os
 from random import randint
 import string
 from joblib import Parallel, delayed
@@ -43,6 +43,11 @@ tfidf_dictionary = gensim.corpora.Dictionary.load(tfidf_dictionary_path)
 
 size = 300 # vector size
 cores = multiprocessing.cpu_count()
+
+
+def img_exists(path):
+    im_path = base_path + "img_resized/" + path + ".jpg"
+    return os.path.isfile(im_path)
 
 print "Loading data"
 with open(instaBCN_text_data_path,"r") as file:
@@ -123,6 +128,12 @@ for r in results:
     if sum(r[1]) == 0:
         print "Continuing, sum = 0"
         continue
+
+    # Check if image file exists
+    if not img_exists(str(r[0])):
+        print "Img file does not exist"
+        continue
+
     try:
         out = str(r[0])
         for v in r[1]:
