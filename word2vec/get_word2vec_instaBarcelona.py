@@ -24,11 +24,11 @@ tfidf_model_path = base_path + 'models/tfidf/tfidf_model_instaBarcelona.model'
 tfidf_dictionary_path = base_path + 'models/tfidf/docs.dict'
 
 # Create output files
-dir = "word2vec_mean_gt"
-if tfidf_weighted: dir = "word2vec_tfidf_weighted_gt"
-gt_path_train = base_path + dir + '/train_instaBarcelona_divbymax.txt'
-gt_path_val = base_path + dir + '/val_instaBarcelona_divbymax.txt'
-gt_path_test = base_path + dir + '/test_instaBarcelona_divbymax.txt'
+dir = "word2vec_l2norm_gt"
+if tfidf_weighted: dir = "word2vec_tfidf_weighted_l2norm_gt"
+gt_path_train = base_path + dir + '/train_instaBarcelona_l2norm.txt'
+gt_path_val = base_path + dir + '/val_instaBarcelona_l2norm.txt'
+gt_path_test = base_path + dir + '/test_instaBarcelona_l2norm.txt'
 train_file = open(gt_path_train, "w")
 val_file = open(gt_path_val, "w")
 test_file = open(gt_path_test, "w")
@@ -105,11 +105,18 @@ def infer_word2vec(id, caption):
             word_embedding = model[tfidf_dictionary[tok[0]]]
             embedding += word_embedding * tok[1]
 
-    embedding = embedding - min(embedding)
+    if min(embedding) < 0:
+        embedding = embedding - min(embedding)
+
     # if sum(embedding) > 0:
     #     embedding = embedding / sum(embedding)
-    if max(embedding) > 0:
-        embedding = embedding / max(embedding)
+
+    # if max(embedding) > 0:
+    #     embedding = embedding / max(embedding)
+
+    # L2 normalized
+    if sum(embedding) > 0:
+        embedding = embedding / np.linalg.norm(embedding)
 
     # out_string = ''
     # for t in range(0,size):
