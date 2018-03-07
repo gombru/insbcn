@@ -8,6 +8,8 @@ en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
 es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
 ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
 
+out_file = open("../../../ssd2/instaBarcelona/lang_data.json",'w')
+
 
 print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
@@ -43,21 +45,44 @@ print "Number of languages: " + str(len(languages.values()))
 print "Languages with max repetitions has:  " + str(max(languages.values()))
 
 
+json.dump(out_file, languages)
+out_file.close()
+
 #Plot
 lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(3,len(lan_count_sorted))
+topX = min(10,len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
 for l in range(0,topX):
     my_xticks.append(lan_sorted[-l-1][0])
 plt.xticks(x, my_xticks, size = 11)
 width = 1/1.5
-plt.bar(x, lan_count_sorted[0:topX], width, color="blue", align="center")
+plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
 plt.title("Number of images per language")
 plt.tight_layout()
 plt.show()
+
+
+#Plot %
+lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
+lan_count_sorted = languages.values()
+lan_count_sorted.sort(reverse=True)
+topX = min(10,len(lan_count_sorted))
+x = range(topX)
+my_xticks = []
+total = sum(lan_count_sorted)
+lan_count_sorted /= total * 100
+for l in range(0,topX):
+    my_xticks.append(lan_sorted[-l-1][0])
+plt.xticks(x, my_xticks, size = 11)
+width = 1/1.5
+plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
+plt.title("% of images per language")
+plt.tight_layout()
+plt.show()
+
 
 
 print "Saving id's per language"

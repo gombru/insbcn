@@ -17,7 +17,7 @@ for k, v in data.iteritems():
     else:
         users[v['owner']['id']] = users[v['owner']['id']] + 1
 
-print "Number of users: " + str(len(users))
+print "Number of authors: " + str(len(users))
 print "User with max publications has:  " + str(max(users.values()))
 
 topX = 5000
@@ -25,8 +25,8 @@ user_publis_sorted = users.values()
 user_publis_sorted.sort(reverse=True)
 x = range(topX)
 width = 1/1.5
-plt.bar(x, user_publis_sorted[0:topX], width, color="blue")
-plt.title("Num of posts of top authors")
+plt.bar(x, user_publis_sorted[0:topX], width, color="brown")
+plt.title("Number of posts of top" + str(topX) + "authors")
 plt.show()
 
 if createBlacklist:

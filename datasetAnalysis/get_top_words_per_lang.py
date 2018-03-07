@@ -82,6 +82,7 @@ print "Word with max repetitions has:  " + str(max(words[2].values()))
 
 #Plot
 languages = ['en','es','ca']
+colors = ["r","g","b"]
 for l in range(3):
     print languages[l]
     words_sorted = sorted(words[l].items(), key=operator.itemgetter(1))
@@ -102,9 +103,9 @@ for l in range(3):
         my_xticks.append(words_sorted[-c-1][0])
     plt.xticks(x, my_xticks, rotation=90, size=11)
     width = 1/1.5
-    plt.bar(x, words_count_sorted[1:topX], width, color="blue", align="center")
+    plt.bar(x, words_count_sorted[1:topX], width, color=colors[l], align="center")
     plt.tight_layout()
-    plt.title("Num of top words " + languages[l])
+    plt.title("Instances of most repeated words (" + languages[l] + ")")
     plt.show()
 
 print "Done"
