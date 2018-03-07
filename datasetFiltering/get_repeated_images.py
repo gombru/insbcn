@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 images_path = "../../../hd/datasets/instaBarcelona/img/"
+duplicated_blacklist = open("../../../ssd2/instaBarcelona/duplicated_blacklist.txt", "w")
 
 i = 0
 images = {}
@@ -18,6 +19,7 @@ for file in glob.glob(images_path + "/*.jpg"):
         images[key] = 1
     else:
         images[key]+=1
+        duplicated_blacklist.write(str(file.split('/')[-1].split('.')[0]) + '\n')
     print i
 
 values = sorted(images.values(), reverse = True)

@@ -3,10 +3,10 @@ import plotly.plotly as py
 from load_jsons import *
 import collections
 
-posts_TH = 100  # Will discard users having more than this publications, they are probably spam
+posts_TH = 50  # Will discard users having more than this publications, they are probably spam
 createBlacklist = True
 
-data = load("../../../hd/datasets/instaBarcelona/json/")
+data = load("../../../ssd2/instaBarcelona/json/")
 print "Number of jsons: " + str(len(data))
 
 # Plot num of publications of top  users
@@ -28,12 +28,11 @@ width = 1/1.5
 plt.bar(x, user_publis_sorted[0:topX], width, color="blue")
 plt.title("Num of posts of top authors")
 plt.show()
-print "Done"
 
 if createBlacklist:
     # Create a blacklist of users: That will be users having more than X publications (100)
     print "Creating users black list"
-    users_blacklist = open("../../../hd/datasets/instaBarcelona/users_blacklist" + str(posts_TH) + ".txt","w")
+    users_blacklist = open("../../../ssd2/instaBarcelona/users_blacklist" + str(posts_TH) + ".txt","w")
     blacklisted = 0
     for user, num in users.iteritems():
         if num > posts_TH:

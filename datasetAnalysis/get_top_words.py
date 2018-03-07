@@ -6,7 +6,7 @@ from stop_words import get_stop_words
 
 
 print "Loading data"
-with open("../../../hd/datasets/instaBarcelona/captions.json","r") as file:
+with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 symbols = ['.','/','\\',',']
@@ -32,7 +32,6 @@ for k,v in data.iteritems():
     filtered_words = []
     for i in c_words:
         if i not in stop: filtered_words.append(i)
-    print len(filtered_words)
 
     for w in filtered_words:
 

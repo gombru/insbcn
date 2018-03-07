@@ -6,9 +6,10 @@ from PIL import Image
 from joblib import Parallel, delayed
 import os
 from shutil import copyfile
+import time
 
 images_path = "../../../hd/datasets/instaBarcelona/img/"
-im_dest_path = "../../../hd/datasets/instaBarcelona/img_resized/"
+im_dest_path = "../../../ssd2/instaBarcelona/img_resized/"
 
 minSize = 256
 
@@ -36,11 +37,16 @@ def resize(file):
         # print "New height "+str(new_height)
         im = im.resize((new_width, new_height), Image.ANTIALIAS)
         im.save(im_dest_path + file.split('/')[-1])
+
     except:
         print "Failed copying image. Removing image and caption"
-        os.remove(file)
-        os.remove(file.replace("img", "json").replace("jpg", "json"))
-
+        try:
+            os.remove(file)
+            os.remove(file.replace("img", "json").replace("jpg", "json"))
+            os.remove(file.replace("img", "json_filtered").replace("jpg", "json").replace("/hd/datasets/","/ssd2/"))
+        except:
+            print "Cannot remove"
+            return
         print "Removed"
         return
 

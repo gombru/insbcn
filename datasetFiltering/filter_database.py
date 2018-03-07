@@ -3,24 +3,31 @@ import json
 from shutil import copyfile
 from langdetect import detect, detect_langs
 
-filtered_jsons_dir = "../../../hd/datasets/instaBarcelona/json_filtered/"
-output_file_path = "../../../hd/datasets/instaBarcelona/captions.json"
+filtered_jsons_dir = "../../../ssd2/instaBarcelona/json_filtered/"
+output_file_path = "../../../ssd2/instaBarcelona/captions.json"
 
-word_TH = 4
+word_TH = 3
 
-data = load("../../../hd/datasets/instaBarcelona/json/")
+data = load("../../../ssd2/instaBarcelona/json/")
 print "Number of jsons: " + str(len(data))
+
+# Load duplicated blacklist
+duplicated_blacklist = []
+users_blacklist_file = open("../../../ssd2/instaBarcelona/duplicated_blacklist.txt", "r")
+for line in users_blacklist_file:
+    duplicated_blacklist.append(line.replace('\n', ''))
+duplicated_blacklist.close()
 
 # Load users blacklist
 users_blacklist = []
-users_blacklist_file = open("../../../hd/datasets/instaBarcelona/users_blacklist.txt", "r")
+users_blacklist_file = open("../../../ssd2/instaBarcelona/users_blacklist150.txt", "r")
 for line in users_blacklist_file:
     users_blacklist.append(line.replace('\n', ''))
 users_blacklist_file.close()
 
 # City names to filter: We'll filter images containing other city names appart from barcelona. That will discard spam
 cities = []
-cities_file = open("../../../hd/datasets/instaBarcelona/cities.txt", "r")
+cities_file = open("../../../ssd2/instaBarcelona/cities.txt", "r")
 for line in cities_file:
     cities.append(line.replace('\n', ''))
 cities_file.close()
@@ -30,6 +37,8 @@ discarded_by_city = 0
 discarded_by_short_caption = 0
 discarded_by_nul_caption = 0
 discarded_by_lan = 0
+discarded_by_duplicated = 0
+
 
 output_data = {}
 
@@ -48,6 +57,13 @@ for k, v in data.iteritems():
             print "Num of posts dicarded by user: " + str(discarded_by_user)
         continue
 
+    # Discard by duplicated
+    if k in duplicated_blacklist:
+        discarded_by_duplicated += 1
+        if discarded_by_duplicated % 500 == 0:
+            print "Num of posts dicarded by duplicated: " + str(discarded_by_user)
+        continue
+
     # Check if post has caption
     if 'caption' not in v:
         discarded_by_nul_caption += 1
@@ -64,7 +80,7 @@ for k, v in data.iteritems():
     # Check num of words. Discard if under the threshold
     if len(words) < word_TH:
         discarded_by_short_caption += 1
-        if discarded_by_short_caption % 500 == 0:
+        if discarded_by_short_caption % 1000 == 0:
             print "Num of posts dicarded by short caption: " + str(discarded_by_short_caption)
         continue
 
@@ -73,7 +89,7 @@ for k, v in data.iteritems():
     for city in cities:
         if city in caption:
             discarded_by_city += 1
-            if discarded_by_city % 500 == 0:
+            if discarded_by_city % 1000 == 0:
                 print "Num of posts dicarded by city: " + str(discarded_by_city)
             cur_discarded = True
             break
@@ -88,7 +104,7 @@ for k, v in data.iteritems():
 
         if 'en' not in languages_names and 'es' not in languages_names and 'ca' not in languages_names:
             discarded_by_lan += 1
-            if discarded_by_lan % 500 == 0:
+            if discarded_by_lan % 1000 == 0:
                 print "Num of posts dicarded by language: " + str(discarded_by_lan)
             continue
     except:
@@ -105,7 +121,7 @@ for k, v in data.iteritems():
 
 print "Discards: No captions: " + str(discarded_by_nul_caption) + " Short: " + str(
     discarded_by_short_caption) + " City: " + str(discarded_by_city) + " User: " + str(
-    discarded_by_user) + " Language: " + str(discarded_by_lan)
+    discarded_by_user) + " Language: " + str(discarded_by_lan) + " Duplicated: " + str(discarded_by_duplicated)
 print "Number of original vs resulting elements: " + str(len(output_data)) + " vs " + str(len(data))
 
 print "Saving JSON"

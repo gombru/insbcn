@@ -4,12 +4,20 @@ import json
 import operator
 from langdetect import detect, detect_langs
 
+en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
+es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
+ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
+
+
 print "Loading data"
-with open("../../../hd/datasets/instaBarcelona/captions.json","r") as file:
+with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 print "Counting languages"
 languages = {}
+en = []
+es = []
+ca = []
 
 for k,v in data.iteritems():
     caption = v.replace('#', ' ')
@@ -24,6 +32,11 @@ for k,v in data.iteritems():
         languages[lan] = 1
     else:
         languages[lan] = languages[lan] + 1
+
+    if lan == 'en': en.append(k)
+    elif lan == 'es': es.append(k)
+    elif lan == 'ca': ca.append(k)
+
 
 print languages
 print "Number of languages: " + str(len(languages.values()))
@@ -42,8 +55,17 @@ for l in range(0,topX):
 plt.xticks(x, my_xticks, size = 11)
 width = 1/1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="blue", align="center")
-plt.title("Num of top languages")
+plt.title("Number of images per language")
 plt.tight_layout()
 plt.show()
+
+
+print "Saving id's per language"
+for id in en: en_ids.write(str(id) + '\n')
+for id in es: es_ids.write(str(id) + '\n')
+for id in ca: ca_ids.write(str(id) + '\n')
+en_ids.close()
+es_ids.close()
+ca_ids.close()
 
 print "Done"
