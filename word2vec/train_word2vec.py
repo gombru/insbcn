@@ -8,20 +8,22 @@ import json
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
+lan = 'en'
 
 cores = multiprocessing.cpu_count()
 
-finetune = False
-if finetune:
-    print "Loading pretrained model"
-    pretrained_model_path = '../../../datasets/word2vec_pretrained/GoogleNews-vectors-negative300.bin'
-    model = gensim.models.Word2Vec.load_word2vec_format(pretrained_model_path, binary=True)
-
-
 whitelist = string.letters + string.digits + ' '
-instaBCN_text_data_path = '../../../hd/datasets/instaBarcelona/captions.json'
-model_path = '../../../hd/datasets/instaBarcelona/models/word2vec/word2vec_model_instaBarcelona.model'
+instaBCN_text_data_path = '../../../ssd2/instaBarcelona/captions.json'
+model_path = '../../../ssd2/instaBarcelona/models/word2vec/word2vec_model_instaBarcelona_' + lan + '.model'
 words2filter = ['rt','http','t','gt','co','s','https','http','tweet','markars_','photo','pictur','picture','say','photo','much','tweet','now','blog','wikipedia','google', 'flickr', 'figure', 'photo', 'image', 'homepage', 'url', 'youtube','wikipedia','google', 'flickr', 'figure', 'photo', 'image', 'homepage', 'url', 'youtube', 'images', 'blog', 'pinterest']
+
+
+# Load lan ids
+lan_ids = []
+lan_ids_file = open("../../../ssd2/instaBarcelona/" + lan + "_ids.txt", "r")
+for line in lan_ids_file:
+    lan_ids.append(line.replace('\n', ''))
+lan_ids_file.close()
 
 print "Loading data"
 with open(instaBCN_text_data_path,"r") as file:
@@ -41,21 +43,25 @@ for w in es_stop:
     en_stop.append(w)
 for w in ca_stop:
     en_stop.append(w)
+
 # add own stop words
 for w in words2filter:
     en_stop.append(w)
 
 posts_text = [] #List of lists of tokens
 
-
 def get_instaBarcelona():
+    lan_instances = 0
     for k, v in data.iteritems():
-        filtered_caption = ""
-        caption = v.replace('#', ' ')
-        for char in caption:
-            if char in whitelist:
-                filtered_caption += char
-        posts_text.append(filtered_caption.decode('utf-8').lower())
+        if k in lan_ids:
+            lan_instances +=1
+            filtered_caption = ""
+            caption = v.replace('#', ' ')
+            for char in caption:
+                if char in whitelist:
+                    filtered_caption += char
+            posts_text.append(filtered_caption.decode('utf-8').lower())
+    print "Lan instances: " + str(lan_instances) + " , total instances: " + str(len(data))
     return posts_text
 
 posts_text = get_instaBarcelona()
@@ -85,11 +91,7 @@ posts_text = []
 
 #Train the model
 print "Training ..."
-if finetune:
-    print model.iter
-    model.train(texts, total_examples=model.corpus_count, epochs=25, compute_loss=False)
-else:
-    model = gensim.models.Word2Vec(texts, size=size, min_count=min_count, workers=cores, iter=iter, window=window)
+model = gensim.models.Word2Vec(texts, size=size, min_count=min_count, workers=cores, iter=iter, window=window)
 
 model.save(model_path)
 print "DONE"
