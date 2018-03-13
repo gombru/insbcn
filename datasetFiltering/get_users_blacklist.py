@@ -20,7 +20,7 @@ for k, v in data.iteritems():
 print "Number of authors: " + str(len(users))
 print "User with max publications has:  " + str(max(users.values()))
 
-topX = 5000
+topX = 2000
 user_publis_sorted = users.values()
 user_publis_sorted.sort(reverse=True)
 x = range(topX)

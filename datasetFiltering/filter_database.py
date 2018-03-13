@@ -17,12 +17,14 @@ users_blacklist_file = open("../../../ssd2/instaBarcelona/duplicated_blacklist.t
 for line in users_blacklist_file:
     duplicated_blacklist.append(line.replace('\n', ''))
 duplicated_blacklist.close()
+print("Blacklisted imgs: " + str(len(duplicated_blacklist)))
 
 # Load users blacklist
 users_blacklist = []
-users_blacklist_file = open("../../../ssd2/instaBarcelona/users_blacklist150.txt", "r")
+users_blacklist_file = open("../../../ssd2/instaBarcelona/users_blacklist50.txt", "r")
 for line in users_blacklist_file:
     users_blacklist.append(line.replace('\n', ''))
+print("Blacklisted users: " + str(len(users_blacklist)))
 users_blacklist_file.close()
 
 # City names to filter: We'll filter images containing other city names appart from barcelona. That will discard spam
@@ -30,6 +32,7 @@ cities = []
 cities_file = open("../../../ssd2/instaBarcelona/cities.txt", "r")
 for line in cities_file:
     cities.append(line.replace('\n', ''))
+print("Blacklisted cities: " + str(len(cities)))
 cities_file.close()
 
 discarded_by_user = 0
@@ -61,7 +64,7 @@ for k, v in data.iteritems():
     if k in duplicated_blacklist:
         discarded_by_duplicated += 1
         if discarded_by_duplicated % 500 == 0:
-            print "Num of posts dicarded by duplicated: " + str(discarded_by_user)
+            print "Num of posts dicarded by duplicated: " + str(discarded_by_duplicated)
         continue
 
     # Check if post has caption

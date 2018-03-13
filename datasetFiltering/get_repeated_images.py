@@ -12,15 +12,20 @@ i = 0
 images = {}
 for file in glob.glob(images_path + "/*.jpg"):
     i+=1
-    s = os.path.getsize(file)
-    im = Image.open(file)
-    key = str(im.size[0]) + str(im.size[1]) + str(s)
-    if not images.has_key(key):
-        images[key] = 1
-    else:
-        images[key]+=1
+    try:
+        s = os.path.getsize(file)
+        im = Image.open(file)
+        key = str(im.size[0]) + str(im.size[1]) + str(s)
+        if not images.has_key(key):
+            images[key] = 1
+        else:
+            images[key]+=1
+            duplicated_blacklist.write(str(file.split('/')[-1].split('.')[0]) + '\n')
+    except:
+        print "Corrupted image, saving to list"
         duplicated_blacklist.write(str(file.split('/')[-1].split('.')[0]) + '\n')
-    print i
+
+    if i%10000 == 0: print i
 
 values = sorted(images.values(), reverse = True)
 
