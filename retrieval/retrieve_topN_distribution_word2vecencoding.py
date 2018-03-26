@@ -97,7 +97,7 @@ q = ['ciutatvella','barceloneta','gotic','raval','born','eixample','santantoni',
 
 for e,cur_q in enumerate(q):
     print(cur_q)
-    results_path = "../../../ssd2/instaBarcelona/retrieval_results/" + data + "/" + cur_q.replace(' ', '_') + '_word2vec/'
+    results_path = "../../../ssd2/instaBarcelona/retrieval_results/" + data + "_word2vec/" + cur_q.replace(' ', '_') + '/'
     if not os.path.exists(results_path):
         print("Creating dir: " + results_path)
         os.makedirs(results_path)
