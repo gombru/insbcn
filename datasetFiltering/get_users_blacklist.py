@@ -4,7 +4,7 @@ from load_jsons import *
 import collections
 
 posts_TH = 50  # Will discard users having more than this publications, they are probably spam
-createBlacklist = True
+createBlacklist = False
 
 data = load("../../../ssd2/instaBarcelona/json/")
 print "Number of jsons: " + str(len(data))
@@ -20,13 +20,14 @@ for k, v in data.iteritems():
 print "Number of authors: " + str(len(users))
 print "User with max publications has:  " + str(max(users.values()))
 
-topX = 2000
+topX = 5000
 user_publis_sorted = users.values()
 user_publis_sorted.sort(reverse=True)
 x = range(topX)
 width = 1/1.5
+plt.ylim([0,1000])
 plt.bar(x, user_publis_sorted[0:topX], width, color="brown")
-plt.title("Number of posts of top" + str(topX) + "authors")
+# plt.title("Number of posts of top" + str(topX) + "authors")
 plt.show()
 
 if createBlacklist:

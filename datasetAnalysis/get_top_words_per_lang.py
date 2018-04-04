@@ -2,16 +2,19 @@ import matplotlib.pyplot as plt
 import operator
 from stop_words import get_stop_words
 import json
-from langdetect import detect, detect_langs
 
-
+print "Loading languages ids"
+en_ids = [line.strip('\n') for line in open("../../../ssd2/instaBarcelona/en_ids.txt", "r")]
+es_ids = [line.strip('\n') for line in open("../../../ssd2/instaBarcelona/es_ids.txt", "r")]
+ca_ids = [line.strip('\n') for line in open("../../../ssd2/instaBarcelona/ca_ids.txt", "r")]
 
 print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
-symbols = ['.','/','\\',',']
-stop = ['que','the','and','para','con','los','por','una','del','las','for','you','with','this','mas','are','como','that']
+# Get stop words
+stop = ['que','the','and','para','con','los','por','una','del','las','for','you','with','this','mas','are','como','that','.','/','\\',',','instagood','picoftheday','like','',' ','photooftheday','photo','pic','vs','*','panathinaikos','pues','tbt','hem','mes','...','instagram','like4like','one','.',',','-','barcelona','bcn']
+
 en_stop = get_stop_words('en')
 for w in en_stop:
     stop.append(w)
@@ -25,15 +28,18 @@ for w in ca_stop:
 print "Counting words"
 words = [dict() for x in range(3)]
 
+c = 0
 for k,v in data.iteritems():
-    caption = v.replace('#', ' ')
-    caption = caption.lower()
-    try:
-        lan = detect(caption)
-    except:
-        print "Lang detection failed. Continuing"
+
+    if k in en_ids: caption_lan = 0
+    elif k in es_ids: caption_lan = 1
+    elif k in ca_ids: caption_lan = 2
+    else:
+        print "Language not found"
         continue
 
+    caption = v.replace('#', ' ')
+    caption = caption.lower()
     c_words = caption.split()
 
     # Filter stop_words
@@ -43,41 +49,23 @@ for k,v in data.iteritems():
 
     for w in filtered_words:
 
-        # Filter short words
-        if len(w) < 3: continue
-
-        # Filter symbols
-        symbol = False
-        for s in symbols:
-            if s in w:
-                symbol = True
-                break
-        if symbol: continue
-
-        if lan == 'en':
-            l = 0
-
-        if lan == 'es':
-            l = 1
-
-        if lan == 'ca':
-            l = 2
-
-        if w not in words[l]:
-            words[l][w] = 1
+        if w not in words[caption_lan]:
+            words[caption_lan][w] = 1
         else:
-            words[l][w] = words[l][w] + 1
+            words[caption_lan][w] = words[caption_lan][w] + 1
 
+    c+=1
+    if c % 10000 == 0:
+        print c
 
+        print "Number of words en: " + str(len(words[0]))
+        print "Word with max repetitions has:  " + str(max(words[0].values()))
+        print "Number of words es: " + str(len(words[1]))
+        print "Word with max repetitions has:  " + str(max(words[1].values()))
+        print "Number of words ca: " + str(len(words[2]))
+        print "Word with max repetitions has:  " + str(max(words[2].values()))
 
-print "Number of words en: " + str(len(words[0]))
-print "Word with max repetitions has:  " + str(max(words[0].values()))
-
-print "Number of words es: " + str(len(words[1]))
-print "Word with max repetitions has:  " + str(max(words[1].values()))
-
-print "Number of words ca: " + str(len(words[2]))
-print "Word with max repetitions has:  " + str(max(words[2].values()))
+print words
 
 
 #Plot
@@ -107,5 +95,13 @@ for l in range(3):
     plt.tight_layout()
     plt.title("Instances of most repeated words (" + languages[l] + ")")
     plt.show()
+
+
+with open('../../../ssd2/instaBarcelona/word_count_en.json','w') as file:
+    json.dump(words[0],file)
+with open('../../../ssd2/instaBarcelona/word_count_es.json','w') as file:
+    json.dump(words[1],file)
+with open('../../../ssd2/instaBarcelona/word_count_ca.json','w') as file:
+    json.dump(words[2],file)
 
 print "Done"

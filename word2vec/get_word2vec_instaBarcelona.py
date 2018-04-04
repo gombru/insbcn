@@ -15,17 +15,16 @@ import gensim
 import multiprocessing
 import json
 
+
+lan = 'en'
+
 # Load data and model
-base_path = '../../../hd/datasets/instaBarcelona/'
+base_path = '../../../ssd2/instaBarcelona/'
 instaBCN_text_data_path = base_path + 'captions.json'
-model_path = base_path + 'models/word2vec/word2vec_model_instaBarcelona.model'
-tfidf_weighted = True
-tfidf_model_path = base_path + 'models/tfidf/tfidf_model_instaBarcelona.model'
-tfidf_dictionary_path = base_path + 'models/tfidf/docs.dict'
+model_path = base_path + 'models/word2vec/word2vec_model_instaBarcelona_' + lan + '.model'
 
 # Create output files
-dir = "word2vec_l2norm_gt"
-if tfidf_weighted: dir = "word2vec_tfidf_weighted_l2norm_gt"
+dir = "word2vec_l2norm_gt_" + lan
 gt_path_train = base_path + dir + '/train_instaBarcelona_l2norm.txt'
 gt_path_val = base_path + dir + '/val_instaBarcelona_l2norm.txt'
 gt_path_test = base_path + dir + '/test_instaBarcelona_l2norm.txt'
@@ -36,9 +35,15 @@ test_file = open(gt_path_test, "w")
 words2filter = ['rt','http','t','gt','co','s','https','http','tweet','markars_','photo','pictur','picture','say','photo','much','tweet','now','blog']
 
 
+# Load lan ids
+lan_ids = []
+lan_ids_file = open("../../../ssd2/instaBarcelona/" + lan + "_ids.txt", "r")
+for line in lan_ids_file:
+    lan_ids.append(line.replace('\n', ''))
+lan_ids_file.close()
+
 model = gensim.models.Word2Vec.load(model_path)
-tfidf_model = gensim.models.TfidfModel.load(tfidf_model_path)
-tfidf_dictionary = gensim.corpora.Dictionary.load(tfidf_dictionary_path)
+
 
 
 size = 300 # vector size
@@ -72,6 +77,12 @@ whitelist = string.letters + string.digits + ' '
 
 
 def infer_word2vec(id, caption):
+
+    embedding = np.zeros(size)
+
+
+    if id not in lan_ids: return id, embedding
+
     filtered_caption = ""
     caption = caption.replace('#', ' ')
     for char in caption:
@@ -83,27 +94,17 @@ def infer_word2vec(id, caption):
     stopped_tokens = [i for i in tokens if not i in en_stop]
     tokens_filtered = [token for token in stopped_tokens if token in model.wv.vocab]
 
+    c = 0
+    for tok in tokens_filtered:
+        try:
+            embedding += model[tok]
+            c += 1
+        except:
+            #print "Word not in model: " + tok
+            continue
+    if c > 0:
+        embedding /= c
 
-    embedding = np.zeros(size)
-
-    if not tfidf_weighted:
-        c = 0
-        for tok in tokens_filtered:
-            try:
-                embedding += model[tok]
-                c += 1
-            except:
-                #print "Word not in model: " + tok
-                continue
-        if c > 0:
-            embedding /= c
-
-    if tfidf_weighted:
-        vec = tfidf_dictionary.doc2bow(tokens_filtered)
-        vec_tfidf = tfidf_model[vec]
-        for tok in vec_tfidf:
-            word_embedding = model[tfidf_dictionary[tok[0]]]
-            embedding += word_embedding * tok[1]
 
     if min(embedding) < 0:
         embedding = embedding - min(embedding)
@@ -130,10 +131,12 @@ parallelizer = Parallel(n_jobs=cores)
 tasks_iterator = (delayed(infer_word2vec)(id,caption) for id, caption in data.iteritems())
 results = parallelizer(tasks_iterator)
 count = 0
+skipped = 0
 for r in results:
     # Create splits random
     if sum(r[1]) == 0:
         print "Continuing, sum = 0"
+        skipped += 1
         continue
 
     # Check if image file exists
@@ -151,6 +154,7 @@ for r in results:
             train_file.write(out)
         elif split == 19: val_file.write(out)
         else: test_file.write(out)
+        count += 0
     except:
         print "Error writing to file: "
         print r[0]
@@ -161,4 +165,4 @@ train_file.close()
 val_file.close()
 test_file.close()
 
-print "Done"
+print "Done. Skipped: " + str(skipped)  + " Saved: " + str(count)

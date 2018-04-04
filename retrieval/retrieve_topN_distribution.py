@@ -12,7 +12,7 @@ num_topics = 82 # Embedding dimensionality
 num_results = 20 # Num retrival results
 
 # Topic distribution given by the CNN to test images. .txt file with format city/{im_id},score1,score2 ...
-database_path = '../../../datasets/instaBarcelona/regression_output/' + data +'/test.txt'
+database_path = '../../../ssd2/instaBarcelona/regression_output/' + data +'/test.txt'
 neighbourhoods = ['ciutatvella','barceloneta','gotic','raval','born','eixample','santantoni','novaesquerra','antigaesquerra','dretaeixample','portpienc','sagradafamilia','santsmontjuic','sants','badal','labordeta','hostafrancs','fontdelaguatlla','marinadeport','poblesec','marinadelpratvermell','lescorts','maternitat','pedralbes','sarriasantgervasi','sarria','santgervasi','lestrestorres','elputxet','labonanova','vallvidrera','gracia','gracianova','viladegracia','lasalut','elcoll','vallcarca','hortaguinardo','baixguinardo','elguinardo','canbaro','lafontdenfargues','elcarmel','laclota','lateixonera','lavalldhebron','horta','montbau','santgenisdelsagudells','noubarris','villapicina','porta','elturodelapeira','canpeguera','prosperitat','verdum','trinitatnova','laguineueta','lesroquetes','torrebaro','canyelles','vallbona','ciutatmeridiana','santandreu','navas','lasagrera','bonpastor','elcongresielsindians','santandreudelpalomar','barodeviver','trinitatvella','santmarti','villaolimpica','poblenou','diagonalmar','elbesos','provenals','llacuna','elclot','santmartideprovenals','campdelarpa','lavernedailapau']
 
 
@@ -46,7 +46,7 @@ def get_results(database, topics, num_results, results_path):
     # Get elements with min distances
     for idx,id in enumerate(distances):
         # Copy image results
-        copyfile('../../../datasets/instaBarcelona/img_resized/' + id[0] + '.jpg' , results_path + id[0].replace('/', '_') + '.jpg')
+        copyfile('../../../ssd2/instaBarcelona/img_resized/' + id[0] + '.jpg' , results_path + id[0].replace('/', '_') + '.jpg')
         if idx == num_results - 1: break
 
 
@@ -55,7 +55,7 @@ q = ['ciutatvella','eixample','sants','santsmonjuic','monjuic','lescorts','sarri
 
 for e,cur_q in enumerate(q):
     print(cur_q)
-    results_path = "../../../datasets/instaBarcelona/retrieval_results/" + data + "/" + cur_q.replace(' ', '_') + '/'
+    results_path = "../../../ssd2/instaBarcelona/retrieval_results/" + data + "/" + cur_q.replace(' ', '_') + '/'
     if not os.path.exists(results_path):
         print("Creating dir: " + results_path)
         os.makedirs(results_path)

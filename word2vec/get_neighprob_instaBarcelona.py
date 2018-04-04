@@ -19,7 +19,7 @@ import json
 lan = 'en'
 
 # Load data and model
-base_path = '../../../ssd2/instaBarcelona/'
+base_path = '../../../datasets/instaBarcelona/'
 instaBCN_text_data_path = base_path + 'captions.json'
 model_path = base_path + 'models/word2vec/word2vec_model_instaBarcelona_' + lan + '.model'
 
@@ -40,7 +40,7 @@ words2filter = ['rt','http','t','gt','co','s','https','http','tweet','markars_',
 
 # Load lan ids
 lan_ids = []
-lan_ids_file = open("../../../ssd2/instaBarcelona/" + lan + "_ids.txt", "r")
+lan_ids_file = open("../../../datasets/instaBarcelona/" + lan + "_ids.txt", "r")
 for line in lan_ids_file:
     lan_ids.append(line.replace('\n', ''))
 lan_ids_file.close()
@@ -102,7 +102,7 @@ def infer_word2vec(id, caption):
                 embedding[i] += model.wv.similarity(tok, n)
                 c += 1
             except:
-                print "Error computing similarity: " + tok + " - " + n
+                # print "Error computing similarity: " + tok + " - " + n
                 continue
     if c > 0:
         embedding /= c
@@ -130,9 +130,9 @@ for r in results:
         continue
 
     # Check if image file exists
-    if not img_exists(str(r[0])):
-        print "Img file does not exist"
-        continue
+    # if not img_exists(str(r[0])):
+    #     print "Img file does not exist"
+    #     continue
 
     try:
         out = str(r[0])
@@ -144,7 +144,7 @@ for r in results:
             train_file.write(out)
         elif split == 19: val_file.write(out)
         else: test_file.write(out)
-        count += 0
+        count += 1
     except:
         print "Error writing to file: "
         print r[0]

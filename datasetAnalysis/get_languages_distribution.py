@@ -3,50 +3,92 @@ import plotly.plotly as py
 import json
 import operator
 from langdetect import detect, detect_langs
+from joblib import Parallel, delayed
+import numpy as np
 
 en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
 es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
 ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
-
 out_file = open("../../../ssd2/instaBarcelona/lang_data.json",'w')
-
 
 print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 print "Counting languages"
-languages = {}
+languages = {'en': 0, 'es': 0, 'ca': 0}
 en = []
 es = []
 ca = []
 
-for k,v in data.iteritems():
+def detect_lang(k,v):
+    cap_lan = "unknown"
     caption = v.replace('#', ' ')
     caption = caption.lower()
-    try:
-        lan = detect(caption)
-    except:
-        print "Lang detection failed. Continuing"
+    it = 0
+    while cap_lan == "unknown": # Using while because the LSTM gives different answers, and we are supposed to have fitlered other languages
+        try:
+            langs = detect_langs(caption)
+            for cur_lan in langs:
+                cur_lan_str = str(cur_lan).split(':')[0]
+                if cur_lan_str in languages.keys():
+                    cap_lan = cur_lan_str
+                    break
+        except:
+            print "Lang detection failed. Continuing"
+            return k + ',' + cap_lan
+        it += 1
+        if it == 10:
+            print "Limit of iterations reached. Continuing"
+            break
+
+    if cap_lan is 'unknown':
+        print caption
+        print langs
+        print "Lang not found"
+        return k + ',' + cap_lan
+
+    return k + ',' + cap_lan
+
+
+parallelizer = Parallel(n_jobs=12)
+tasks_iterator = (delayed(detect_lang)(k,v) for k,v in data.iteritems())
+r = parallelizer(tasks_iterator)
+# merging the output of the jobs
+strings = np.vstack(r)
+print "Computing done, geting results ..."
+
+dicarded = 0
+for r in strings:
+    k = r[0].split(',')[0]
+    cap_lan = r[0].split(',')[1]
+    if cap_lan == 'unknown':
+        print "Unknown language"
+        dicarded += 1
         continue
+    if cap_lan == 'en': en.append(k)
+    elif cap_lan == 'es': es.append(k)
+    elif cap_lan == 'ca': ca.append(k)
+    languages[cap_lan] +=  1
 
-    if lan not in languages:
-        languages[lan] = 1
-    else:
-        languages[lan] = languages[lan] + 1
-
-    if lan == 'en': en.append(k)
-    elif lan == 'es': es.append(k)
-    elif lan == 'ca': ca.append(k)
 
 
 print languages
 print "Number of languages: " + str(len(languages.values()))
 print "Languages with max repetitions has:  " + str(max(languages.values()))
+print "Discarded intances:  " + str(dicarded)
 
 
-json.dump(out_file, languages)
+json.dump(languages, out_file)
 out_file.close()
+
+print "Saving id's per language"
+for id in en: en_ids.write(str(id) + '\n')
+for id in es: es_ids.write(str(id) + '\n')
+for id in ca: ca_ids.write(str(id) + '\n')
+en_ids.close()
+es_ids.close()
+ca_ids.close()
 
 #Plot
 lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
@@ -85,12 +127,5 @@ plt.show()
 
 
 
-print "Saving id's per language"
-for id in en: en_ids.write(str(id) + '\n')
-for id in es: es_ids.write(str(id) + '\n')
-for id in ca: ca_ids.write(str(id) + '\n')
-en_ids.close()
-es_ids.close()
-ca_ids.close()
 
 print "Done"

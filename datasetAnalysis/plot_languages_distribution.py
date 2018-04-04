@@ -20,13 +20,13 @@ x = range(topX)
 my_xticks = []
 for l in range(0,topX):
     my_xticks.append(lan_sorted[-l-1][0])
-plt.xticks(x, my_xticks, size = 11)
+plt.xticks(x, my_xticks, size = 20)
 width = 1/1.5
 barlist = plt.bar(x, lan_count_sorted[0:topX], width, align="center")
 barlist[0].set_color('r')
 barlist[1].set_color('g')
 barlist[2].set_color('b')
-plt.title("Number of images per language")
+# plt.title("Number of images per language")
 plt.tight_layout()
 plt.show()
 
