@@ -10,6 +10,7 @@ en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
 es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
 ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
 out_file = open("../../../ssd2/instaBarcelona/lang_data.json",'w')
+out_file_all = open("../../../ssd2/instaBarcelona/lang_data_all.json",'w')
 
 print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
@@ -17,6 +18,7 @@ with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
 
 print "Counting languages"
 languages = {'en': 0, 'es': 0, 'ca': 0}
+all_languages = {}
 en = []
 es = []
 ca = []
@@ -31,12 +33,13 @@ def detect_lang(k,v):
             langs = detect_langs(caption)
             for cur_lan in langs:
                 cur_lan_str = str(cur_lan).split(':')[0]
+                # Assign to one of the used languages
                 if cur_lan_str in languages.keys():
                     cap_lan = cur_lan_str
                     break
         except:
             print "Lang detection failed. Continuing"
-            return k + ',' + cap_lan
+
         it += 1
         if it == 10:
             print "Limit of iterations reached. Continuing"
@@ -46,9 +49,14 @@ def detect_lang(k,v):
         print caption
         print langs
         print "Lang not found"
-        return k + ',' + cap_lan
 
-    return k + ',' + cap_lan
+    # Save language with higher prob
+    try:
+        cap_lan_higher_prob = str(langs[0]).split(':')[0]
+    except:
+        cap_lan_higher_prob = "unknown"
+
+    return k + ',' + cap_lan + ',' + cap_lan_higher_prob
 
 
 parallelizer = Parallel(n_jobs=12)
@@ -62,6 +70,7 @@ dicarded = 0
 for r in strings:
     k = r[0].split(',')[0]
     cap_lan = r[0].split(',')[1]
+    cap_lan_higher = r[0].split(',')[2]
     if cap_lan == 'unknown':
         print "Unknown language"
         dicarded += 1
@@ -71,16 +80,27 @@ for r in strings:
     elif cap_lan == 'ca': ca.append(k)
     languages[cap_lan] +=  1
 
+    if cap_lan_higher in all_languages:
+        all_languages[cap_lan_higher] += 1
+    else:
+        all_languages[cap_lan_higher] = 1
 
-
+print "SELECTED LANGUAGES"
 print languages
 print "Number of languages: " + str(len(languages.values()))
 print "Languages with max repetitions has:  " + str(max(languages.values()))
 print "Discarded intances:  " + str(dicarded)
 
 
+print "ALL"
+print all_languages
+print "Number of languages: " + str(len(all_languages.values()))
+print "Languages with max repetitions has:  " + str(max(all_languages.values()))
+
 json.dump(languages, out_file)
 out_file.close()
+json.dump(all_languages, out_file_all)
+out_file_all.close()
 
 print "Saving id's per language"
 for id in en: en_ids.write(str(id) + '\n')
@@ -112,6 +132,41 @@ lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = languages.values()
 lan_count_sorted.sort(reverse=True)
 topX = min(10,len(lan_count_sorted))
+x = range(topX)
+my_xticks = []
+total = sum(lan_count_sorted)
+lan_count_sorted /= total * 100
+for l in range(0,topX):
+    my_xticks.append(lan_sorted[-l-1][0])
+plt.xticks(x, my_xticks, size = 11)
+width = 1/1.5
+plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
+plt.title("% of images per language")
+plt.tight_layout()
+plt.show()
+
+#Plot
+lan_sorted = sorted(all_languages.items(), key=operator.itemgetter(1))
+lan_count_sorted = all_languages.values()
+lan_count_sorted.sort(reverse=True)
+topX = min(20,len(lan_count_sorted))
+x = range(topX)
+my_xticks = []
+for l in range(0,topX):
+    my_xticks.append(lan_sorted[-l-1][0])
+plt.xticks(x, my_xticks, size = 11)
+width = 1/1.5
+plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
+plt.title("Number of images per language")
+plt.tight_layout()
+plt.show()
+
+
+#Plot %
+lan_sorted = sorted(all_languages.items(), key=operator.itemgetter(1))
+lan_count_sorted = all_languages.values()
+lan_count_sorted.sort(reverse=True)
+topX = min(20,len(all_languages))
 x = range(topX)
 my_xticks = []
 total = sum(lan_count_sorted)

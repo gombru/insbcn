@@ -40,18 +40,18 @@ def resize(file):
         im.save(im_dest_path + im_path.split('/')[-1])
 
     except:
-        print "Failed copying image. Removing image and caption"
-        try:
-            print "Removing"
-            #os.remove(im_path)
-            #os.remove(file)
-        except:
-            print "Cannot remove"
-            return
-        print "Removed"
+        print "Failed copying image" #. Removing image and caption"
+        # try:
+        #     print "Removing"
+        #     #os.remove(im_path)
+        #     #os.remove(file)
+        # except:
+        #     print "Cannot remove"
+        #     return
+        # print "Removed"
         return
 
 
 if not os.path.exists(im_dest_path):
     os.makedirs(im_dest_path)
-Parallel(n_jobs=1)(delayed(resize)(file) for file in glob.glob(filtered_json_path + "/*.json"))
+Parallel(n_jobs=12)(delayed(resize)(file) for file in glob.glob(filtered_json_path + "/*.json"))

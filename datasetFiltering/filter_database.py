@@ -99,21 +99,21 @@ for k, v in data.iteritems():
     if cur_discarded: continue
 
     # Check language
-    try:
-        languages = detect_langs(caption)
-        languages_names = []
-        for l in languages:
-            languages_names.append(l.lang)
-
-        if 'en' not in languages_names and 'es' not in languages_names and 'ca' not in languages_names:
-            discarded_by_lan += 1
-            if discarded_by_lan % 1000 == 0:
-                print "Num of posts dicarded by language: " + str(discarded_by_lan)
-            continue
-    except:
-        print "Error detecting language, continuing"
-        discarded_by_lan += 1
-        continue
+    # try:
+    #     languages = detect_langs(caption)
+    #     languages_names = []
+    #     for l in languages:
+    #         languages_names.append(l.lang)
+    #
+    #     if 'en' not in languages_names and 'es' not in languages_names and 'ca' not in languages_names:
+    #         discarded_by_lan += 1
+    #         if discarded_by_lan % 1000 == 0:
+    #             print "Num of posts dicarded by language: " + str(discarded_by_lan)
+    #         continue
+    # except:
+    #     print "Error detecting language, continuing"
+    #     discarded_by_lan += 1
+    #     continue
 
     # Else save the data in a dir with keys the id and with values the captions (originals)
     output_data[k] = v['caption']
