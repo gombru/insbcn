@@ -98,14 +98,14 @@ for i, lan in enumerate(langs):
 
 x =  np.asarray(range(len(districts)))
 plt.xticks(x, districts, size=11, rotation=70)
-width = 0.1
+width = 0.15
 ax = plt.subplot(111)
 
 # hotels
-l0 = ax.bar(x+-width*2, hotels, width, color='y',align='center')
-l1 = ax.bar(x-width, mentions_data[0], width, color='r',align='center')
-l2 = ax.bar(x, mentions_data[1], width, color='g',align='center')
-l3 = ax.bar(x+width, mentions_data[2], width, color='b',align='center')
+l0 = ax.bar(x-width*1.5, hotels, width, color='y',align='center')
+l1 = ax.bar(x-width*0.5, mentions_data[0], width, color='r',align='center')
+l2 = ax.bar(x+width*0.5, mentions_data[1], width, color='g',align='center')
+l3 = ax.bar(x+width*1.5, mentions_data[2], width, color='b',align='center')
 # Population
 # l4 = ax.bar(x+width, mentions_data, width, color='orange',align='center')
 # Youth

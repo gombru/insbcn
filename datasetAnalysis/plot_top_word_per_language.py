@@ -9,6 +9,15 @@ en_words = json.load(open('../../../datasets/instaBarcelona/word_count_en.json',
 es_words = json.load(open('../../../datasets/instaBarcelona/word_count_es.json','r'))
 ca_words = json.load(open('../../../datasets/instaBarcelona/word_count_ca.json','r'))
 
+# ww = 'gaudi,sagradafamilia,barceloneta,parkguell,campnou,tibidabo,sitges,montserrat,gracia,eixample,poblenou,gothic,casabatllo,larambla,raval,lapedrera'
+# ww = ww.split(',')
+#
+# for w in ww:
+#     try:
+#         print w + ',' + str(en_words[w] + es_words[w] + ca_words[w])
+#     except:
+#         print w + ',' + str(0)
+
 
 words = [en_words, es_words, ca_words]
 # words_2_filter = ['\xeb\xb0\x94\xeb\xa5\xb4\xec\x85\x80\xeb\xa1\x9c\xeb\x82\x98','visitbarcelona','gaud\xc3\xad','ig_barcelona','fcb','leomessi','ok_catalunya','\xe2\xad\x95\xe2\x97\xaf\xe2\x97\xa6','photographer','catalunyaexperience','barca','igerscatalunya','barcelonacity','instadaily','barcelonagram','igersbarcelona','igersbcn','travelgram','travelphotography','instatravel','m\xc3\xa9s','spain','catalunya','catalonia','espa\xc3\xb1a','catalu\xc3\xb1a','lecheria','venezuela','anzoategui','puertodelacruz','puertolacruz','dels','2017','vamos','gracias','gran','puedes','hoy','mejor','gusta','fin','guanta','as\xc3\xad','d\xc3\xada','solo','d\xc3\xadas','barcelona.','foto','photography']
@@ -40,15 +49,16 @@ for l in range(3):
     words_sorted = sorted(words[l].items(), key=operator.itemgetter(1))
     words_sorted = [w for w in words_sorted if len(w[0]) > 2 and str(w[0].encode('utf-8')) not in words_2_filter]
 
+    words_count_sorted = words[l].values()
+    words_count_sorted.sort(reverse=True)
+
     # Print top words
     num2print =50
     out = ""
     for i in range(num2print):
-        out = out + ' ' + words_sorted[-i - 1][0]
+        out = out + ' ' + words_sorted[-i - 1][0] + ',' + str(words_count_sorted[i]) + '\n'
     print out
 
-    words_count_sorted = words[l].values()
-    words_count_sorted.sort(reverse=True)
     topX = 20
     x = range(topX-1)
     my_xticks = []
