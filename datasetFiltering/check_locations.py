@@ -1,6 +1,6 @@
 from load_jsons import *
 
-directory = '../../../datasets/instaBarcelona/img/'
+directory = '../../../hd/datasets/instaBarcelona/img_json_extra/'
 data = load(directory)
 print "Number of jsons: " + str(len(data))
 locations = {}
