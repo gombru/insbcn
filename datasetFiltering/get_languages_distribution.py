@@ -16,6 +16,7 @@ print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
+
 print "Counting languages"
 languages = {'en': 0, 'es': 0, 'ca': 0}
 all_languages = {}

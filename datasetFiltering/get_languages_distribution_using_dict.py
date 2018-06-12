@@ -1,16 +1,19 @@
+# -*- coding: utf-8 -*-#
+
 import matplotlib.pyplot as plt
 import json
 import operator
 from joblib import Parallel, delayed
 import numpy as np
+import time
 
 
+omited_words_file = open("../../../ssd2/instaBarcelona/words_2_filter.txt", "r")
 
-en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
-es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
-ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
-out_file = open("../../../ssd2/instaBarcelona/lang_data.json",'w')
-out_file_all = open("../../../ssd2/instaBarcelona/lang_data_all.json",'w')
+en_ids = open("../../../ssd2/instaBarcelona/en_ids_dict.txt", "w")
+es_ids = open("../../../ssd2/instaBarcelona/es_ids_dict.txt", "w")
+ca_ids = open("../../../ssd2/instaBarcelona/ca_ids_dict.txt", "w")
+out_file = open("../../../ssd2/instaBarcelona/lang_data_dict.json",'w')
 
 languages = {'en': 0, 'es': 0, 'ca': 0}
 dictionaries = {'en': 0, 'es': 0, 'ca': 0}
@@ -18,23 +21,35 @@ dictionaries = {'en': 0, 'es': 0, 'ca': 0}
 en = []
 es = []
 ca = []
+omited_words = []
+
+for line in omited_words_file:
+    w = unicode(line.rstrip(), "utf-8")
+    omited_words.append(w)
+
+print omited_words
 
 def read_dict(lan):
     print("Reading dictionary " + lan)
     dict = ""
-    with open("../../../datasets/instaBarcelona/es.dict", "r") as file:
+    with open("../../../ssd2/instaBarcelona/dictionaries/" + lan + ".dict", "r") as file:
         for l in file:
             dict += l
     dict = dict.replace(' ','\n').splitlines()
-    return dict
+
+    dict_words = []
+    for w in dict:
+         dict_words.append(unicode(w, "utf-8"))
+
+    return dict_words
 
 print "Loading data"
 with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
     data = json.load(file)
 
 print "Reading dictionaries"
-for k,v in languages:
-    languages[k] = read_dict(k)
+for k,v in languages.iteritems():
+    dictionaries[k] = read_dict(k)
 
 print "Counting languages"
 
@@ -43,19 +58,25 @@ def detect_lang(k,v):
     cap_lan = "unknown"
     caption = v.replace('#', ' ')
     caption = caption.lower()
-    words = dict.replace(' ', '\n').splitlines()
+    words = caption.replace(' ', '\n').splitlines()
     words_per_lang = {'en': 0, 'es': 0, 'ca': 0}
     for w in words:
-        for k,v in dictionaries:
-            if w in v:
-                words_per_lang[k] += 1
+
+        if len(w) < 3: continue
+
+        if w in omited_words:
+            continue
+
+        for lan_key, dic_words in dictionaries.iteritems():
+            if w in dic_words:
+                words_per_lang[lan_key] += 1
 
     lan = max(words_per_lang.iteritems(), key=operator.itemgetter(1))[0]
     if words_per_lang[lan] > 0: cap_lan = lan
 
     if cap_lan is 'unknown':
-        print caption
         print "Lang not found"
+        print caption
 
     return k + ',' + cap_lan
 
