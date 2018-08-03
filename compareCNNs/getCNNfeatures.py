@@ -9,38 +9,36 @@ caffe.set_device(0)
 caffe.set_mode_gpu()
 
 #Model name
-model = 'instaBarcelona_contrastive_ca_m015_iter_50000'
+model = 'instaBarcelona_contrastive_distribution_randomNeg_ca_m04_iter_100000'
 lan = 'ca'
 #Output file
-output_file_dir = '../../../ssd2/instaBarcelona/ImageNetfeatures/' + lan
+output_file_dir = '../../../datasets/instaBarcelona/ImageNetfeatures/' + lan
 if not os.path.exists(output_file_dir):
     os.makedirs(output_file_dir)
 
 net = caffe.Net('../../SocialMediaWeakLabeling/googlenet_regression/original_prototxt/deploy.prototxt', '../../../datasets/SocialMedia/models/pretrained/bvlc_googlenet.caffemodel', caffe.TEST)
 
 
-neigh = ['barceloneta','gotic','born','poblesec','poblenou','ciutatvella','eixample','lescorts','sarriasantgervasi','gracia','hortaguinardo','noubarris','santandreu','santmarti']
+neigh = ['ciutatvella','barceloneta','gotic','raval','born','eixample','santantoni','novaesquerra','antigaesquerra','dretaeixample','portpienc','sagradafamilia','santsmontjuic','sants','badal','labordeta','hostafrancs','fontdelaguatlla','marinadeport','poblesec','marinadelpratvermell','lescorts','maternitat','pedralbes','sarriasantgervasi','sarria','santgervasi','lestrestorres','elputxet','labonanova','vallvidrera','gracia','gracianova','viladegracia','lasalut','elcoll','vallcarca','hortaguinardo','baixguinardo','elguinardo','canbaro','lafontdenfargues','elcarmel','laclota','lateixonera','lavalldhebron','horta','montbau','santgenisdelsagudells','noubarris','villapicina','porta','elturodelapeira','canpeguera','prosperitat','verdum','trinitatnova','laguineueta','lesroquetes','torrebaro','canyelles','vallbona','ciutatmeridiana','santandreu','navas','lasagrera','bonpastor','elcongresielsindians','santandreudelpalomar','barodeviver','trinitatvella','santmarti','villaolimpica','poblenou','diagonalmar','elbesos','provenals','llacuna','elclot','santmartideprovenals','campdelarpa','lavernedailapau']
 
 for cur_neigh in neigh:
 
     features = np.zeros(1024)
 
-    test = os.listdir('../../../ssd2/instaBarcelona/retrieval_results/model/' + cur_neigh)
+    test = os.listdir('../../../datasets/instaBarcelona/retrieval_results/' + model + '/' + cur_neigh)
     output_file_path = output_file_dir + '/' + cur_neigh + '.txt'
 
     size = 227
     # Reshape net
-    batch_size = 250 #300
+    batch_size = 300 #300
     net.blobs['data'].reshape(batch_size, 3, size, size)
 
-    print 'Computing  ...'
+    print 'Computing  ... ' + cur_neigh
 
     count = 0
     i = 0
     while i < len(test):
         indices = []
-        if i % 100 == 0:
-            print i
 
         # Fill batch
         for x in range(0, batch_size):
@@ -49,7 +47,7 @@ for cur_neigh in neigh:
 
             # load image
             # filename = '../../../datasets/WebVision/test_images_256/' + test[i]
-            filename = '../../../ssd2/instaBarcelona/v2/img_resized/' + test[i].split(',')[0] + '.jpg'
+            filename = '../../../datasets/instaBarcelona/retrieval_results/' + model + '/' + cur_neigh + '/' + test[i].split(',')[0]
             im = Image.open(filename)
             im_o = im
             im = im.resize((size, size), Image.ANTIALIAS)
@@ -76,13 +74,11 @@ for cur_neigh in neigh:
 
         # Save results for each batch element
         for x in range(0,len(indices)):
-            topic_probs = net.blobs['pool5/7x7_s1'].data[x]
+            topic_probs = net.blobs['pool5/7x7_s1'].data[x][:,0,0]
             features += topic_probs
 
     features /= len(test)
-    np.savetxt(output_file_path)
+    np.savetxt(output_file_path, features)
 
 print "DONE"
-print output_file_path
-
 

@@ -9,13 +9,18 @@ import numpy as np
 en_ids = open("../../../ssd2/instaBarcelona/en_ids.txt", "w")
 es_ids = open("../../../ssd2/instaBarcelona/es_ids.txt", "w")
 ca_ids = open("../../../ssd2/instaBarcelona/ca_ids.txt", "w")
-out_file = open("../../../ssd2/instaBarcelona/lang_data.json",'w')
-out_file_all = open("../../../ssd2/instaBarcelona/lang_data_all.json",'w')
+out_file = open("../../../ssd2/instaBarcelona/lang_data.json", 'w')
+out_file_all = open("../../../ssd2/instaBarcelona/lang_data_all.json", 'w')
+
+omited_words_file = open("../../../ssd2/instaBarcelona/words_2_filter.txt", "r")
+omited_words = []
+for line in omited_words_file:
+    w = unicode(line.rstrip(), "utf-8")
+    omited_words.append(w)
 
 print "Loading data"
-with open("../../../ssd2/instaBarcelona/captions.json","r") as file:
+with open("../../../ssd2/instaBarcelona/captions.json", "r") as file:
     data = json.load(file)
-
 
 print "Counting languages"
 languages = {'en': 0, 'es': 0, 'ca': 0}
@@ -24,12 +29,22 @@ en = []
 es = []
 ca = []
 
-def detect_lang(k,v):
+
+def detect_lang(k, v):
     cap_lan = "unknown"
     caption = v.replace('#', ' ')
+    caption = caption.replace('\n', ' ')
+    caption = caption.rstrip()
     caption = caption.lower()
+
+    for word2omit in omited_words:
+        if word2omit in caption:
+            print caption
+            caption = caption.replace(word2omit, ' ')
+            print caption
+
     it = 0
-    while cap_lan == "unknown": # Using while because the LSTM gives different answers, and we are supposed to have fitlered other languages
+    while cap_lan == "unknown":  # Using while because the LSTM gives different answers, and we are supposed to have fitlered other languages
         try:
             langs = detect_langs(caption)
             for cur_lan in langs:
@@ -43,13 +58,11 @@ def detect_lang(k,v):
 
         it += 1
         if it == 10:
-            print "Limit of iterations reached. Continuing"
+            # print "Limit of iterations reached. Continuing"
             break
 
-    if cap_lan is 'unknown':
-        print caption
-        print langs
-        print "Lang not found"
+    # if cap_lan is 'unknown':
+    #    print "Lang not found"
 
     # Save language with higher prob
     try:
@@ -61,7 +74,7 @@ def detect_lang(k,v):
 
 
 parallelizer = Parallel(n_jobs=12)
-tasks_iterator = (delayed(detect_lang)(k,v) for k,v in data.iteritems())
+tasks_iterator = (delayed(detect_lang)(k, v) for k, v in data.iteritems())
 r = parallelizer(tasks_iterator)
 # merging the output of the jobs
 strings = np.vstack(r)
@@ -76,10 +89,13 @@ for r in strings:
         print "Unknown language"
         dicarded += 1
         continue
-    if cap_lan == 'en': en.append(k)
-    elif cap_lan == 'es': es.append(k)
-    elif cap_lan == 'ca': ca.append(k)
-    languages[cap_lan] +=  1
+    if cap_lan == 'en':
+        en.append(k)
+    elif cap_lan == 'es':
+        es.append(k)
+    elif cap_lan == 'ca':
+        ca.append(k)
+    languages[cap_lan] += 1
 
     if cap_lan_higher in all_languages:
         all_languages[cap_lan_higher] += 1
@@ -91,7 +107,6 @@ print languages
 print "Number of languages: " + str(len(languages.values()))
 print "Languages with max repetitions has:  " + str(max(languages.values()))
 print "Discarded intances:  " + str(dicarded)
-
 
 print "ALL"
 print all_languages
@@ -111,77 +126,76 @@ en_ids.close()
 es_ids.close()
 ca_ids.close()
 
-#Plot
+# Plot
 lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(10,len(lan_count_sorted))
+topX = min(10, len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
-for l in range(0,topX):
-    my_xticks.append(lan_sorted[-l-1][0])
-plt.xticks(x, my_xticks, size = 11)
-width = 1/1.5
+for l in range(0, topX):
+    my_xticks.append(lan_sorted[-l - 1][0])
+plt.xticks(x, my_xticks, size=11)
+width = 1 / 1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
 plt.title("Number of images per language")
 plt.tight_layout()
 plt.show()
 
-
-#Plot %
+# Plot %
 lan_sorted = sorted(languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(10,len(lan_count_sorted))
+topX = min(10, len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
 total = sum(lan_count_sorted)
-lan_count_sorted /= total * 100
-for l in range(0,topX):
-    my_xticks.append(lan_sorted[-l-1][0])
-plt.xticks(x, my_xticks, size = 11)
-width = 1/1.5
+for i, v in lan_count_sorted:
+    lan_count_sorted[i] = v / total * 100
+
+for l in range(0, topX):
+    my_xticks.append(lan_sorted[-l - 1][0])
+plt.xticks(x, my_xticks, size=11)
+width = 1 / 1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
 plt.title("% of images per language")
 plt.tight_layout()
 plt.show()
 
-#Plot
+# Plot
 lan_sorted = sorted(all_languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = all_languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(20,len(lan_count_sorted))
+topX = min(20, len(lan_count_sorted))
 x = range(topX)
 my_xticks = []
-for l in range(0,topX):
-    my_xticks.append(lan_sorted[-l-1][0])
-plt.xticks(x, my_xticks, size = 11)
-width = 1/1.5
+for l in range(0, topX):
+    my_xticks.append(lan_sorted[-l - 1][0])
+plt.xticks(x, my_xticks, size=11)
+width = 1 / 1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
 plt.title("Number of images per language")
 plt.tight_layout()
 plt.show()
 
-
-#Plot %
+# Plot %
 lan_sorted = sorted(all_languages.items(), key=operator.itemgetter(1))
 lan_count_sorted = all_languages.values()
 lan_count_sorted.sort(reverse=True)
-topX = min(20,len(all_languages))
+topX = min(20, len(all_languages))
 x = range(topX)
 my_xticks = []
 total = sum(lan_count_sorted)
-lan_count_sorted /= total * 100
-for l in range(0,topX):
-    my_xticks.append(lan_sorted[-l-1][0])
-plt.xticks(x, my_xticks, size = 11)
-width = 1/1.5
+for i, v in lan_count_sorted:
+    lan_count_sorted[i] = v / total * 100
+
+for l in range(0, topX):
+    my_xticks.append(lan_sorted[-l - 1][0])
+plt.xticks(x, my_xticks, size=11)
+width = 1 / 1.5
 plt.bar(x, lan_count_sorted[0:topX], width, color="brown", align="center")
 plt.title("% of images per language")
 plt.tight_layout()
 plt.show()
-
-
-
 
 print "Done"
